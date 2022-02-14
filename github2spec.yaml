@@ -1,0 +1,10 @@
+wal-g:
+  license: Apache-2.0
+  group: Development/Libraries
+  url: github.com/wal-g/wal-g
+  buildArch: x86_64
+  files:
+   - %{_libdir}/libsnappy.so*
+   - %{_docdir}/snappy
+   - %exclude %{_libdir}/libsnappy.a
+   - %exclude %{_libdir}/libsnappy.la
