@@ -1,41 +1,53 @@
 #!/usr/bin/env python
 import requests
 import re
+import yaml
+try:
+    from yaml import CLoader as Loader, CDumper as Dumper
+except ImportError:
+    from yaml import Loader, Dumper
+   
+class githubrepo(dict):
+    __site = "github.com"
+    __organization = ""
+    __repository = ""
+    __release = ""
+    __asset_filter = None
 
-def get_repo_info(repo):
-    url = repo
-    # e.a. https://github.com/wal-g/wal-g/releases/latest
+    def __init__(self, values):
+        self.__organization = values.get('organization')
+        self.__repository = values.get('repository')
+        self.__release = values.get('release', 'latest')
+        self.__asset_filter = re.compile(values.get('asset_filter', '.'))
+        self.get_release_info()
+        self.update(values)
 
-    result = requests.get(url)
-    data = result.json()
-    #print(data)
-    repo_info = {
-        'description': data['description'],
-        'license': data['license']['spdx_id']
-    }
+    def get_repo_info(self):
+        url = 'https://api.{}/repos/{}/{}'.format(self.__site, self.__organization, self.__repository)
+        result = requests.get(url)
+        data = result.json()
+        repo_info = {}
+        repo_info['description'] = data['description']
+        repo_info['license'] = data['license']['spdx_id']
+        self.update(repo_info)
+        return repo_info
+    
+    def get_release_info(self):
+        self.get_repo_info()
+        url = 'https://api.{}/repos/{}/{}/releases/{}'.format(self.__site, self.__organization, self.__repository, self.__release)
+        result = requests.get(url)
+        data = result.json()
 
-    #data = open('wal-g.latest').read()
-    return repo_info
-
-def get_release_info(repo, asset_filter):
-    release_info = get_repo_info(repo)
-    url = repo+'/releases/latest'
-    # e.a. https://github.com/wal-g/wal-g/releases/latest
-
-    result = requests.get(url)
-    data = result.json()
-    #data = open('wal-g.latest').read()
-    #print(data)
-    release_info['release'] = data['name'],
-    release_info['changelog'] = data['body']
-    release_info['assets'] = release_assets = {}
-    re_asset = re.compile(asset_filter)
-    for asset in data['assets']:
-        if re_asset.search(asset['name']):
-            print(asset['name'])
-            release_assets[asset['name']] = asset['url']
-
-    return release_info
+        self['release_info'] = release_info = {}
+        release_info['release'] = data['name'],
+        release_info['changelog'] = data['body']
+        release_info['assets'] = release_assets = {}
+        for asset in data['assets']:
+            if self.__asset_filter.search(asset['name']):
+                print(asset['name'])
+                release_assets[asset['name']] = asset['url']
+        self.update(release_info)
+        return release_info
 
 
 '''
@@ -64,10 +76,10 @@ wal-g:
 
 
 def main():
-    rel_info = get_release_info('https://api.github.com/repos/wal-g/wal-g', 'wal-g-pg-.*-amd64.tar.gz')
-    print(rel_info)
-#    repo_info = get_repo_info('https://api.github.com/repos/wal-g/wal-g')
-#    print(repo_info)
+    repos = yaml.load(open('github2spec.yaml'), Loader=Loader)
+    for name, values in repos.items():
+        repo = githubrepo(values)
+        print(repo)
 
 
 if __name__ == '__main__':
