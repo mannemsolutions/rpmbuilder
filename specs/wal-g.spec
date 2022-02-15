@@ -5,15 +5,14 @@ Release: 1%{?dist}
 License: Apache-2.0
 Group: Unspecified
 Url: https://github.com/wal-g/wal-g
-{}
-Source0:        %{name}-%{version}.tar.gz
-BuildArch: 	x86_64
+Source0: wal-g-pg-ubuntu-18.04-amd64.tar.gz
+BuildArch: x86_64
 
 %description
-Snappy is a compression/decompression library. It does not aim for maximum compression, or compatibility with any other compression library; instead, it aims for very high speeds and reasonable compression. For instance, compared to the fastest mode of zlib, Snappy is an order of magnitude faster for most inputs, but the resulting compressed files are anywhere from 20% to 100% bigger. 
+Archival and Restoration for Postgres
 
 %prep
-%setup -n %{name}-%{version} -q
+prep.sh wal-g-pg
 
 %build
 %configure
@@ -30,16 +29,6 @@ rm -rf $RPM_BUILD_ROOT
 %{_docdir}/snappy
 %exclude %{_libdir}/libsnappy.a
 %exclude %{_libdir}/libsnappy.la
-
-%package devel
-summary: Development libraries for snappy, a fast compressor/decompressor.
-
-%description devel
-Snappy is a compression/decompression library. It does not aim for maximum compression, or compatibility with any other compression library; instead, it aims for very high speeds and reasonable compression. For instance, compared to the fastest mode of zlib, Snappy is an order of magnitude faster for most inputs, but the resulting compressed files are anywhere from 20% to 100% bigger.
-
-%files devel
-%{_prefix}/include*
-
 
 %changelog
 Some interesting features/fixes:

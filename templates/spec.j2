@@ -5,15 +5,14 @@ Release: 1%{?dist}
 License: {{ repoinfo.license }}
 Group: {{ repoinfo.group | default('Unspecified') }}
 Url: {{ repoinfo.url }}
-{}
-Source0:        %{name}-%{version}.tar.gz
-BuildArch: 	x86_64
+{% for asset in repoinfo.assets %}Source{{ loop.index0 }}: {{ asset.name }}
+{% endfor %}BuildArch: {{ arch | default('x86_64') }}
 
 %description
-Snappy is a compression/decompression library. It does not aim for maximum compression, or compatibility with any other compression library; instead, it aims for very high speeds and reasonable compression. For instance, compared to the fastest mode of zlib, Snappy is an order of magnitude faster for most inputs, but the resulting compressed files are anywhere from 20% to 100% bigger. 
+{{ repoinfo.description }}
 
 %prep
-%setup -n %{name}-%{version} -q
+prep.sh {{ repoinfo.name }}
 
 %build
 %configure
@@ -26,20 +25,7 @@ Snappy is a compression/decompression library. It does not aim for maximum compr
 rm -rf $RPM_BUILD_ROOT
 
 %files
-%{_libdir}/libsnappy.so*
-%{_docdir}/snappy
-%exclude %{_libdir}/libsnappy.a
-%exclude %{_libdir}/libsnappy.la
-
-%package devel
-summary: Development libraries for snappy, a fast compressor/decompressor.
-
-%description devel
-Snappy is a compression/decompression library. It does not aim for maximum compression, or compatibility with any other compression library; instead, it aims for very high speeds and reasonable compression. For instance, compared to the fastest mode of zlib, Snappy is an order of magnitude faster for most inputs, but the resulting compressed files are anywhere from 20% to 100% bigger.
-
-%files devel
-%{_prefix}/include*
-
-
+{% for file in repoinfo.files %}{{ file }}
+{% endfor %}
 %changelog
 {{ repoinfo.changelog }}

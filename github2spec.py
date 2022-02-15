@@ -47,10 +47,10 @@ class githubrepo(dict):
         self['release_info'] = release_info = {}
         release_info['version'] = data['name']
         release_info['changelog'] = data['body']
-        release_info['assets'] = release_assets = {}
+        release_info['assets'] = release_assets = []
         for asset in data['assets']:
             if self.__asset_filter.search(asset['name']):
-                release_assets[asset['name']] = asset['url']
+                release_assets.append({ 'name': asset['name'], 'url': asset['url']})
         self.update(release_info)
         return release_info
 
