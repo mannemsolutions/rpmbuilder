@@ -1,3 +1,4 @@
+%global _prefix /usr/local
 Summary: {{ repoinfo.description }}
 Name: {{ repoinfo.name }}
 Version: {{ repoinfo.version }}
@@ -20,7 +21,7 @@ Url: {{ repoinfo.url }}
 mkdir -p %{buildroot}/%{_bindir}
 {% for asset in repoinfo.assets %}tar -xvf %{_sourcedir}/{{ asset.name }}
 {% endfor %}
-{% for file in repoinfo.files %}mv %{_builddir}/{{file.src}} %{buildroot}/{{file.dest}}
+{% for file in repoinfo.files %}%{__install} -m {{ file.mode | default('0755') }} %{_builddir}/{{file.src}} %{buildroot}/{{file.dest}}
 {% endfor %}
 
 %clean

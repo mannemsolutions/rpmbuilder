@@ -45,7 +45,7 @@ class githubrepo(dict):
         data = result.json()
 
         self['release_info'] = release_info = {}
-        release_info['version'] = data['name']
+        release_info['version'] = data['tag_name'].replace('-', '.')
         release_info['changelog'] = data['body']
         release_info['assets'] = release_assets = []
         for asset in data['assets']:
@@ -89,7 +89,6 @@ def main():
     for name, values in repos.items():
         repo = githubrepo(values)
         template = env.get_template("spec.j2")
-        print(repo)
         with open(os.path.join('specs', name+'.spec'), 'w') as specfile:
             specfile.write(template.render(repoinfo=repo))
 

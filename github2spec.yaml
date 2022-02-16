@@ -12,3 +12,4 @@ wal-g:
   files:
    - src: 'wal-g-pg-ubuntu-18.04-amd64'
      dest: '%{_bindir}/wal-g-pg'
+     mode: '0755'

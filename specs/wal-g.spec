@@ -1,3 +1,4 @@
+%global _prefix /usr/local
 Summary: Archival and Restoration for Postgres
 Name: wal-g-pg
 Version: v1.1
@@ -20,7 +21,7 @@ curl -L https://github.com/wal-g/wal-g/releases/download/v1.1/wal-g-pg-ubuntu-18
 mkdir -p %{buildroot}/%{_bindir}
 tar -xvf %{_sourcedir}/wal-g-pg-ubuntu-18.04-amd64.tar.gz
 
-mv %{_builddir}/wal-g-pg-ubuntu-18.04-amd64 %{buildroot}/%{_bindir}/wal-g-pg
+%{__install} -m 0755 %{_builddir}/wal-g-pg-ubuntu-18.04-amd64 %{buildroot}/%{_bindir}/wal-g-pg
 
 
 %clean
