@@ -13,3 +13,22 @@ wal-g:
    - src: 'wal-g-pg-ubuntu-18.04-amd64'
      dest: '%{_bindir}/wal-g-pg'
      mode: '0755'
+stolon:
+  name: stolon
+  organization: sorintlab
+  repository: stolon
+  asset_filter: 'stolon-.*-linux-amd64.tar.gz$'
+  buildArch: x86_64
+  files:
+   - src: 'stolon-*-linux-amd64/bin/stolonctl'
+     dest: '%{_bindir}/stolonctl'
+     mode: '0755'
+   - src: 'stolon-*-linux-amd64/bin/stolon-sentinel'
+     dest: '%{_bindir}/stolon-sentinel'
+     mode: '0755'
+   - src: 'stolon-*-linux-amd64/bin/stolon-proxy'
+     dest: '%{_bindir}/stolon-proxy'
+     mode: '0755'
+   - src: 'stolon-*-linux-amd64/bin/stolon-keeper'
+     dest: '%{_bindir}/stolon-keeper'
+     mode: '0755'
