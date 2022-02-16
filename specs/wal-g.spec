@@ -7,25 +7,24 @@ Group: Unspecified
 Url: https://github.com/wal-g/wal-g
 Source0: wal-g-pg-ubuntu-18.04-amd64.tar.gz
 BuildArch: x86_64
+Requires: glibc < 2.29
 
 %description
 Archival and Restoration for Postgres
 
 %prep
-prep.sh wal-g-pg
+curl -L https://github.com/wal-g/wal-g/releases/download/v1.1/wal-g-pg-ubuntu-18.04-amd64.tar.gz -o %{_sourcedir}/wal-g-pg-ubuntu-18.04-amd64.tar.gz
 
-%build
-%configure
-%make_build
 
 %install
-%make_install
+mkdir -p %{buildroot}/%{_bindir}
+tar -xvf %{_sourcedir}/wal-g-pg-ubuntu-18.04-amd64.tar.gz
+
+mv %{_builddir}/wal-g-pg-ubuntu-18.04-amd64 %{buildroot}/%{_bindir}/wal-g-pg
+
 
 %clean
 rm -rf $RPM_BUILD_ROOT
 
 %files
-%{_libdir}/libsnappy.so*
-%{_docdir}/snappy
-%exclude %{_libdir}/libsnappy.a
-%exclude %{_libdir}/libsnappy.la
+%{_bindir}/wal-g-pg

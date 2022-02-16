@@ -7,23 +7,25 @@ Group: {{ repoinfo.group | default('Unspecified') }}
 Url: {{ repoinfo.url }}
 {% for asset in repoinfo.assets %}Source{{ loop.index0 }}: {{ asset.name }}
 {% endfor %}BuildArch: {{ arch | default('x86_64') }}
-
+{% for require in repoinfo.requires %}Requires: {{ require }}
+{% endfor %}
 %description
 {{ repoinfo.description }}
 
 %prep
-prep.sh {{ repoinfo.name }}
-
-%build
-%configure
-%make_build
+{% for asset in repoinfo.assets %}curl -L {{ asset.url }} -o %{_sourcedir}/{{ asset.name }}
+{% endfor %}
 
 %install
-%make_install
+mkdir -p %{buildroot}/%{_bindir}
+{% for asset in repoinfo.assets %}tar -xvf %{_sourcedir}/{{ asset.name }}
+{% endfor %}
+{% for file in repoinfo.files %}mv %{_builddir}/{{file.src}} %{buildroot}/{{file.dest}}
+{% endfor %}
 
 %clean
 rm -rf $RPM_BUILD_ROOT
 
 %files
-{% for file in repoinfo.files %}{{ file }}
+{% for file in repoinfo.files %}{{ file.dest }}
 {% endfor %}
