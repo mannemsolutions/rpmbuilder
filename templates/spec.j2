@@ -27,5 +27,3 @@ rm -rf $RPM_BUILD_ROOT
 %files
 {% for file in repoinfo.files %}{{ file }}
 {% endfor %}
-%changelog
-{{ repoinfo.changelog }}
