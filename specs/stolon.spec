@@ -20,10 +20,10 @@ curl -L https://github.com/sorintlab/stolon/releases/download/v0.17.0/stolon-v0.
 mkdir -p %{buildroot}/%{_bindir}
 tar -xvf %{_sourcedir}/stolon-v0.17.0-linux-amd64.tar.gz
 
-%{__install} -m 0755 %{_builddir}/stolon-*-linux-amd64/bin/stolonctl %{buildroot}/%{_bindir}/stolonctl
-%{__install} -m 0755 %{_builddir}/stolon-*-linux-amd64/bin/stolon-sentinel %{buildroot}/%{_bindir}/stolon-sentinel
-%{__install} -m 0755 %{_builddir}/stolon-*-linux-amd64/bin/stolon-proxy %{buildroot}/%{_bindir}/stolon-proxy
-%{__install} -m 0755 %{_builddir}/stolon-*-linux-amd64/bin/stolon-keeper %{buildroot}/%{_bindir}/stolon-keeper
+%{__install} -m 0755 %{_builddir}/stolon-v0.17.0-linux-amd64/bin/stolonctl %{buildroot}/%{_bindir}/stolonctl
+%{__install} -m 0755 %{_builddir}/stolon-v0.17.0*-linux-amd64/bin/stolon-sentinel %{buildroot}/%{_bindir}/stolon-sentinel
+%{__install} -m 0755 %{_builddir}/stolon-v0.17.0-linux-amd64/bin/stolon-proxy %{buildroot}/%{_bindir}/stolon-proxy
+%{__install} -m 0755 %{_builddir}/stolon-v0.17.0-linux-amd64/bin/stolon-keeper %{buildroot}/%{_bindir}/stolon-keeper
 
 
 %clean

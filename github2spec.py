@@ -4,35 +4,52 @@ import re
 import os.path
 import yaml
 
-from jinja2 import Environment, FileSystemLoader, select_autoescape
+import jinja2
 
 try:
     from yaml import CLoader as Loader, CDumper as Dumper
 except ImportError:
     from yaml import Loader, Dumper
 
-class githubrepo(dict):
-    __site = "github.com"
-    __organization = ""
-    __repository = ""
-    __release = ""
-    __asset_filter = None
 
+def recursive_render(tpl, values):
+     prev = tpl
+     while True:
+         curr = jinja2.Template(prev).render(**values)
+         if curr != prev:
+             prev = curr
+         else:
+             return curr
+
+
+class githubrepo(dict):
     def __init__(self, values):
-        self.__organization = values.get('organization')
-        self.__repository = values.get('repository')
-        self.__release = values.get('release', 'latest')
-        self.__asset_filter = re.compile(values.get('asset_filter', '.'))
-        self['url'] = 'https://{}/{}/{}'.format(self.__site, self.__organization, self.__repository)
+        # Set some defaults in values, also used to set self['url']
+        values['site'] = values.get('site', "github.com")
+        values['repository'] = values.get('repository', values['name'])
+        values['organization'] = values.get('organization', values['repository'])
+
+        # These defaults can be overridden from the yaml config if needed
+        self['url'] = 'https://{site}/{organization}/{repository}'.format(**values)
+        self['package_arch'] = 'x86_64'
+        self['binary_arch'] = 'amd64'
+        self['target_release'] = 'latest'
+        self['package_name'] = values['name']
+        self['asset_filter'] = '{{ name }}-{{ version }}-linux-{{ binary_arch }}.tar.gz$'
+
+        # Copy values into self, get data from github api and overwrite anything from values if needed
+        self.update(values)
         self.get_release_info()
         self.update(values)
 
     def get_repo_info(self):
-        url = 'https://api.{}/repos/{}/{}'.format(self.__site, self.__organization, self.__repository)
+        url = 'https://api.{site}/repos/{organization}/{repository}'.format(**self)
         result = requests.get(url)
         data = result.json()
+        if 'name' not in data:
+            raise Exception("I expected 'name' in the return, but didn't.", data)
         repo_info = {}
-        repo_info['name'] = data['name']
+        repo_info['repo_name'] = data['name']
         repo_info['description'] = data['description']
         repo_info['license'] = data['license']['spdx_id']
         self.update(repo_info)
@@ -40,7 +57,7 @@ class githubrepo(dict):
     
     def get_release_info(self):
         self.get_repo_info()
-        url = 'https://api.{}/repos/{}/{}/releases/{}'.format(self.__site, self.__organization, self.__repository, self.__release)
+        url = 'https://api.{site}/repos/{organization}/{repository}/releases/{target_release}'.format(**self)
         result = requests.get(url)
         data = result.json()
 
@@ -48,24 +65,22 @@ class githubrepo(dict):
         release_info['version'] = data['tag_name'].replace('-', '.')
         release_info['changelog'] = data['body']
         release_info['assets'] = release_assets = []
-        for asset in data['assets']:
-            if self.__asset_filter.search(asset['name']):
-                release_assets.append({ 'name': asset['name'], 'url': asset['browser_download_url']})
         self.update(release_info)
+        asset_filter = re.compile(recursive_render(self.get('asset_filter', '.'), self))
+        for asset in data['assets']:
+            if asset_filter.search(asset['name']):
+                release_assets.append({ 'name': asset['name'], 'url': asset['browser_download_url']})
         return release_info
 
 
 def main():
     repos = yaml.load(open('github2spec.yaml'), Loader=Loader)
-    env = Environment(
-        loader=FileSystemLoader("templates"),
-        autoescape=select_autoescape()
-    )
     for name, values in repos.items():
+        values['name'] = name
         repo = githubrepo(values)
-        template = env.get_template("spec.j2")
+        template = open('templates/spec.j2').read()
         with open(os.path.join('specs', name+'.spec'), 'w') as specfile:
-            specfile.write(template.render(repoinfo=repo))
+            specfile.write(recursive_render(template, repo))
 
 
 if __name__ == '__main__':
