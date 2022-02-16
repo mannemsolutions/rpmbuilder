@@ -55,31 +55,6 @@ class githubrepo(dict):
         return release_info
 
 
-'''
-wal-g:
-  summary: Snappy, a fast compressor/decompressor.
-  version: 1.1.3
-  release: 1%{?dist}
-  license: BSD
-  group: Development/Libraries
-  url: https://github.com/google/snappy
-  source:
-  - %{name}-%{version}.tar.gz
-  buildArch: x86_64
-  description: Snappy is a compression/decompression library. It does not aim for maximum compression, or compatibility with any other compression library; instead, it aims for very high speeds and reasonable compression. For instance, compared to the fastest mode of zlib, Snappy is an order of magnitude faster for most inputs, but the resulting compressed files are anywhere from 20% to 100% bigger.
-  files:
-   - %{_libdir}/libsnappy.so*
-   - %{_docdir}/snappy
-   - %exclude %{_libdir}/libsnappy.a
-   - %exclude %{_libdir}/libsnappy.la
-  changelog:
-  * Tue Oct 10 2017 - S. Mannem <smannem@bol.com>
-  - Initial build of this spec
-'''
-
-
-
-
 def main():
     repos = yaml.load(open('github2spec.yaml'), Loader=Loader)
     env = Environment(
