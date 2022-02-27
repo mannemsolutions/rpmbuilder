@@ -1,0 +1,10 @@
+version: '3.9'
+services:
+  rpmbuilder:
+    build: .
+    command:
+    - bash
+    - '-c'
+    - 'while true; do sleep 1; done'
+    volumes:
+    -  ./:/host
