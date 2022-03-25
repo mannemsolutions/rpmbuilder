@@ -1,5 +1,5 @@
 template: /usr/rpmbuilder/templates/spec.j2
-dest: /tmp
+dest: /host/specs
 repositories:
   wal-g-pg:
     license: Apache-2.0

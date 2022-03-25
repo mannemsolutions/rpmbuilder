@@ -21,7 +21,7 @@ mkdir -p %{buildroot}/%{_bindir}
 tar -xvf %{_sourcedir}/etcd-v3.5.2-linux-amd64.tar.gz
 
 %{__install} -m 0755 %{_builddir}/etcd-v3.5.2-linux-amd64/etcdutl %{buildroot}/%{_bindir}/etcdutl
-%{__install} -m 0755 %{_builddir}/etcd-v3.5.2-linux-amd64/etcdctl %{buildroot}/%{_bindir}/etcctl
+%{__install} -m 0755 %{_builddir}/etcd-v3.5.2-linux-amd64/etcdctl %{buildroot}/%{_bindir}/etcdctl
 %{__install} -m 0755 %{_builddir}/etcd-v3.5.2-linux-amd64/etcd %{buildroot}/%{_bindir}/etcd
 
 
@@ -30,5 +30,5 @@ rm -rf $RPM_BUILD_ROOT
 
 %files
 %{_bindir}/etcdutl
-%{_bindir}/etcctl
+%{_bindir}/etcdctl
 %{_bindir}/etcd
