@@ -1,8 +1,7 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 import requests
 import re
 import os.path
-import yaml
 
 import jinja2
 
@@ -12,18 +11,11 @@ except ImportError:
     from yaml import Loader, Dumper
 
 
-def recursive_render(tpl, values):
-     prev = tpl
-     while True:
-         curr = jinja2.Template(prev).render(**values)
-         if curr != prev:
-             prev = curr
-         else:
-             return curr
-
-
 class githubrepo(dict):
-    def __init__(self, values):
+    __template__ = ''
+
+    def __init__(self, values, template):
+        self.__template = template
         # Set some defaults in values, also used to set self['url']
         values['site'] = values.get('site', "github.com")
         values['repository'] = values.get('repository', values['name'])
@@ -66,23 +58,17 @@ class githubrepo(dict):
         release_info['changelog'] = data['body']
         release_info['assets'] = release_assets = []
         self.update(release_info)
-        asset_filter = re.compile(recursive_render(self.get('asset_filter', '.'), self))
+        asset_filter = re.compile(self.recursive_render(self.get('asset_filter', '.')))
         for asset in data['assets']:
             if asset_filter.search(asset['name']):
                 release_assets.append({ 'name': asset['name'], 'url': asset['browser_download_url']})
         return release_info
 
-
-def main():
-    repos = yaml.load(open('github2spec.yaml'), Loader=Loader)
-    for name, values in repos.items():
-        values['name'] = name
-        repo = githubrepo(values)
-        template = open('templates/spec.j2').read()
-        with open(os.path.join('specs', name+'.spec'), 'w') as specfile:
-            specfile.write(recursive_render(template, repo))
-
-
-if __name__ == '__main__':
-    main()
-
+    def recursive_render(self, tpl):
+         prev = tpl
+         while True:
+             curr = jinja2.Template(prev).render(**self)
+             if curr != prev:
+                 prev = curr
+             else:
+                 return curr
