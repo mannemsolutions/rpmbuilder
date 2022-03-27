@@ -1,7 +1,10 @@
 #!/usr/bin/env python3
+"""
+Create spec files from Github repos using the GithubRepo class
+"""
 import os
 import yaml
-from .githubrepo import githubrepo
+from .githubrepo import GithubRepo
 
 try:
     from yaml import CLoader as Loader
@@ -9,20 +12,27 @@ except ImportError:
     from yaml import Loader
 
 
-def fromConfig():
-    configFile = os.environ.get('GITHUB2SPEC_CONFIG', '/usr/rpmbuilder/conf/github2spec.yaml')
-    config = yaml.load(open(configFile), Loader=Loader)
-    repos=config['repositories']
-    template = open(config['template']).read()
-    dest = config.get('dest', '/tmp')
-    for name, values in repos.items():
-        values['name'] = name
-        repo = githubrepo(values, template)
-        destFile = os.path.join(dest, name+'.spec')
-        print('Writing to {}'.format(destFile))
-        with open(destFile, 'w') as specFile:
-            specFile.write(repo.recursive_render(template))
+def from_config():
+    """
+    Read a yaml config file and loop through repositories to create specs
+    :return:
+    """
+    config_file = os.environ.get('GITHUB2SPEC_CONFIG',
+                                 '/usr/rpmbuilder/conf/github2spec.yaml')
+    with open(config_file, encoding='utf-8') as config_data:
+        config = yaml.load(config_data, Loader=Loader)
+        repos = config['repositories']
+        with open(config['template'], encoding='utf-8') as template_file:
+            template = template_file.read()
+        dest = config.get('dest', '/tmp')
+        for name, values in repos.items():
+            values['name'] = name
+            repo = GithubRepo(values)
+            dest_file = os.path.join(dest, name+'.spec')
+            print(f'Writing to {dest_file}')
+            with open(dest_file, 'w', encoding='utf-8') as spec_file:
+                spec_file.write(repo.recursive_render(template))
 
 
 if __name__ == '__main__':
-    github2spec()
+    from_config()

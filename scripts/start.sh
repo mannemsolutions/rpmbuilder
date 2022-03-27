@@ -1,4 +1,5 @@
 #!/bin/bash
+set -e
 github2spec
 for SPEC in /host/specs/*.spec; do
   rpmbuild -ba "${SPEC}"
