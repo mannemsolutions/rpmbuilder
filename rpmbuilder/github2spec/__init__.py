@@ -1,6 +1,7 @@
 
 """
-This module is used to generate spec files from github repos with singleton binaries usinga jinja2 template.
+Generate spec files from github repos with singleton binaries using jinja2
+template.
 
 It can be configured with a yaml hash.
 """

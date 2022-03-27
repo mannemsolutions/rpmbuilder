@@ -12,14 +12,15 @@ import re
 from setuptools import find_packages
 from setuptools import setup
 
-with open('/usr/rpmbuilder/requirements.txt') as reqfile:
+with open('/usr/rpmbuilder/requirements.txt', encoding='utf-8') as reqfile:
     INSTALL_REQUIREMENTS = reqfile.read().split('\n')
 
 
 def find_version():
     """Read the rpmbuilder version from github2spec/__init__.py."""
     here = os.path.abspath(os.path.dirname(__file__))
-    with codecs.open(os.path.join(here, 'github2spec', '__init__.py'), 'r') as file_pointer:
+    with codecs.open(os.path.join(here, 'github2spec', '__init__.py'),
+                     'r') as file_pointer:
         version_file = file_pointer.read()
     version_match = re.search(r"^__version__ = ['\"]([^'\"]*)['\"]",
                               version_file, re.M)
@@ -35,7 +36,7 @@ setup(
     install_requires=INSTALL_REQUIREMENTS,
     entry_points={
         'console_scripts': [
-            'github2spec=github2spec.commandline:fromConfig',
+            'github2spec=github2spec.commandline:from_config',
         ]
     }
 )
