@@ -9,10 +9,11 @@ This module installs github2spec as a binary.
 import codecs
 import os
 import re
+import pathlib
 from setuptools import find_packages
 from setuptools import setup
 
-with open('/usr/rpmbuilder/requirements.txt', encoding='utf-8') as reqfile:
+with open('requirements.txt', encoding='utf-8') as reqfile:
     INSTALL_REQUIREMENTS = reqfile.read().split('\n')
 
 
@@ -29,9 +30,30 @@ def find_version():
     raise RuntimeError("Unable to find version string.")
 
 
+# The directory containing this file
+HERE = pathlib.Path(__file__).parent
+
+# The text of the README file
+README = (HERE / "README.md").read_text()
+
 setup(
     name='github2spec',
     version=find_version(),
+    description="A tool for building RPM's from github repo's with singleton binaries",
+    long_description=README,
+    long_description_content_type="text/markdown",
+    url="https://github.com/MannemSolutions/rpmbuikder",
+    author="Sebastiaan Mannem",
+    author_email="sebas@mannemsolutions.nl",
+    license="GPL-3.0 License",
+    classifiers=[
+        "License :: OSI Approved :: GNU General Public License v3 (GPLv3)",
+        "Programming Language :: Python :: 3",
+        "Programming Language :: Python :: 3.8",
+        "Programming Language :: Python :: 3.9",
+        "Programming Language :: Python :: 3.10",
+    ],
+    include_package_data=True,
     packages=find_packages(exclude=['contrib', 'docs', 'tests']),
     install_requires=INSTALL_REQUIREMENTS,
     entry_points={

@@ -31,11 +31,13 @@ jobs:
           ./set_version.sh
       - name: Install dependencies
         run: |
+          cd rpmbuilder
           python -m pip install --upgrade pip
           pip install wheel twine
-          pip install -r rpmbuilder/requirements.txt
+          pip install -r requirements.txt
       - name: Build the release
         run: |
+          cd rpmbuilder
           python setup.py sdist bdist_wheel
           twine check dist/*
       - name: Publish to PyPI
