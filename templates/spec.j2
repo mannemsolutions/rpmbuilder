@@ -1,31 +1,32 @@
-Summary: {{ repoinfo.description }}
-Name: {{ repoinfo.name }}
-Version: {{ repoinfo.version }}
+%global _prefix /usr/local
+Summary: {{ description }}
+Name: {{ package_name }}
+Version: {{ version }}
 Release: 1%{?dist}
-License: {{ repoinfo.license }}
-Group: {{ repoinfo.group | default('Unspecified') }}
-Url: {{ repoinfo.url }}
-{% for asset in repoinfo.assets %}Source{{ loop.index0 }}: {{ asset.name }}
-{% endfor %}BuildArch: {{ arch | default('x86_64') }}
-{% for require in repoinfo.requires %}Requires: {{ require }}
+License: {{ license }}
+Group: {{ group | default('Unspecified') }}
+Url: {{ url }}
+{% for asset in assets %}Source{{ loop.index0 }}: {{ asset.name }}
+{% endfor %}BuildArch: {{ package_arch | default('x86_64') }}
+{% for require in requires %}Requires: {{ require }}
 {% endfor %}
 %description
-{{ repoinfo.description }}
+{{ description }}
 
 %prep
-{% for asset in repoinfo.assets %}curl -L {{ asset.url }} -o %{_sourcedir}/{{ asset.name }}
+{% for asset in assets %}curl -L {{ asset.url }} -o %{_sourcedir}/{{ asset.name }}
 {% endfor %}
 
 %install
 mkdir -p %{buildroot}/%{_bindir}
-{% for asset in repoinfo.assets %}tar -xvf %{_sourcedir}/{{ asset.name }}
+{% for asset in assets %}tar -xvf %{_sourcedir}/{{ asset.name }}
 {% endfor %}
-{% for file in repoinfo.files %}mv %{_builddir}/{{file.src}} %{buildroot}/{{file.dest}}
+{% for file in files %}%{__install} -m {{ file.mode | default('0755') }} %{_builddir}/{{file.src}} %{buildroot}/{{file.dest}}
 {% endfor %}
 
 %clean
 rm -rf $RPM_BUILD_ROOT
 
 %files
-{% for file in repoinfo.files %}{{ file.dest }}
+{% for file in files %}{{ file.dest }}
 {% endfor %}
