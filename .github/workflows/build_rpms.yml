@@ -1,0 +1,52 @@
+name: Release workflow for tagged versions
+on:
+  push:
+    # Sequence of patterns matched against refs/tags
+    tags:
+      - 'v*' # Push events to matching v*, i.e. v0.2.19, v0.2.14a
+
+env:
+  GO_VERSION: 1.16
+  GITHUB2SPEC_CONFIG: config/github2spec.yaml
+
+jobs:
+  build_rpms:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        spec: [etcd, stolon, wal-g-pg]
+    steps:
+    - uses: actions/checkout@master
+    - name: Set up Python
+      uses: actions/setup-python@v2
+    - name: install github2spec
+      run: cp README.md rpmbuilder && cd rpmbuilder && pip install --upgrade pip && pip install --no-cache-dir .
+    - name: generate specs
+      run: github2spec
+    - name: install rpmbuild
+      run: apt-get update -y && apt-get install -y rpm
+    - name: build RPM package
+      run: rpmbuild -ba "specs/${{matrix.spec}}.spec"
+    - name: set up gpg
+      run: |
+        echo "Importing pubkey..."
+        cat gpg_pubkey.asc | gpg --import --no-tty --batch --yes
+        echo "Importing seckey..."
+        echo ${{secrets.GPG_KEY}} | base64 -d | gpg --import --no-tty --batch --yes
+        #echo "Listing public keys..."
+        #gpg --list-keys --with-keygrip
+        #echo "Listing secret keys..."
+        #gpg --list-secret-keys
+        echo "Resetting gpg-agent and ingesting passphrase"
+        echo "allow-preset-passphrase" > ~/.gnupg/gpg-agent.conf
+        gpg-connect-agent RELOADAGENT /bye
+        echo ${{secrets.GPG_PASSPHRASE}} | /usr/lib/gnupg2/gpg-preset-passphrase --preset ${{secrets.GPG_KEY}}
+    - name: Sign RPMs
+      run: |
+        cp config/rpmmacros ~/.rpmmacros
+        rpmsign --addsign ./rpms/*.rpm
+#    - name: Upload artifact
+#      uses: actions/upload-artifact@v1.0.0
+#      with:
+#        name: Binary RPM
+#        path: ${{ steps.rpm.outputs.rpm_dir_path }}

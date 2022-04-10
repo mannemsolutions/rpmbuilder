@@ -20,8 +20,8 @@ class GithubRepo(dict):
                                             values['repository'])
 
         # These defaults can be overridden from the yaml config if needed
-        self['url'] = f'https://{values.site}/{values.organization}/' \
-                      f'{values.repository}'
+        self['url'] = f'https://{values["site"]}/{values["organization"]}/' \
+                      f'{values["repository"]}'
         self['package_arch'] = 'x86_64'
         self['binary_arch'] = 'amd64'
         self['target_release'] = 'latest'

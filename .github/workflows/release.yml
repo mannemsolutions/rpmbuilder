@@ -9,6 +9,26 @@ env:
   GO_VERSION: 1.16
 
 jobs:
+  build_rpms:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        specs: ["etcd", "stolon", "wal-g-pg"]
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: build RPM package
+      id: rpm
+      uses: naveenrajm7/rpmbuild@master
+      with:
+        spec_file: "specs/{{ matrix.spec }}.spec"
+
+    - name: Upload artifact
+      uses: actions/upload-artifact@v1.0.0
+      with:
+        name: Binary RPM
+        path: ${{ steps.rpm.outputs.rpm_dir_path }}
+
   release:
     runs-on: ubuntu-latest
     steps:
@@ -20,6 +40,9 @@ jobs:
 
   push_to_pypi:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["3.8", "3.9", "3.10"]
     steps:
       - uses: actions/checkout@v2
       - name: Set up Python ${{ matrix.python-version }}

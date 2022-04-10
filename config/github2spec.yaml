@@ -1,0 +1,44 @@
+template: ./rpmbuilder/templates/spec.j2
+dest: specs/
+repositories:
+  wal-g-pg:
+    license: Apache-2.0
+    repository: wal-g
+    # Yes, wal-g-pg-ubuntu-18.04-amd64.tar.gz is weird for a RH8 rpm, but ubuntu 18.04 has GLIB-C 2.26, and
+    # these work on RH8 (GLIB-C 2.28) too, where ubuntu20 is based on GLIB-C 2.29, and that does not work on RH8.
+    asset_filter: 'wal-g-pg-ubuntu-18.04-amd64.tar.gz'
+    requires:
+      - "glibc < 2.29"
+    files:
+     - src: 'wal-g-pg-ubuntu-18.04-amd64'
+       dest: '%{_bindir}/wal-g-pg'
+       mode: '0755'
+  stolon:
+    organization: sorintlab
+    repository: stolon
+    files:
+     - src: 'stolon-{{ version }}-linux-amd64/bin/stolonctl'
+       dest: '%{_bindir}/stolonctl'
+       mode: '0755'
+     - src: 'stolon-{{ version }}*-linux-amd64/bin/stolon-sentinel'
+       dest: '%{_bindir}/stolon-sentinel'
+       mode: '0755'
+     - src: 'stolon-{{ version }}-linux-amd64/bin/stolon-proxy'
+       dest: '%{_bindir}/stolon-proxy'
+       mode: '0755'
+     - src: 'stolon-{{ version }}-linux-amd64/bin/stolon-keeper'
+       dest: '%{_bindir}/stolon-keeper'
+       mode: '0755'
+  etcd:
+    organization: etcd-io
+    repository: etcd
+    files:
+     - src: 'etcd-{{ version }}-linux-amd64/etcdutl'
+       dest: '%{_bindir}/etcdutl'
+       mode: '0755'
+     - src: 'etcd-{{ version }}-linux-amd64/etcdctl'
+       dest: '%{_bindir}/etcdctl'
+       mode: '0755'
+     - src: 'etcd-{{ version }}-linux-amd64/etcd'
+       dest: '%{_bindir}/etcd'
+       mode: '0755'
