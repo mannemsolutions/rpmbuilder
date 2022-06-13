@@ -13,7 +13,16 @@ import pathlib
 from setuptools import find_packages
 from setuptools import setup
 
-with open('requirements.txt', encoding='utf-8') as reqfile:
+# The directory containing this file
+HERE = pathlib.Path(__file__).parent
+
+# The text of the requirements file
+INSTALL_REQUIREMENTS = (HERE / "requirements.txt").read_text().split('\n')
+
+# The text of the README file
+README = (HERE / "../README.md").read_text()
+
+with open(HERE / 'requirements.txt', encoding='utf-8') as reqfile:
     INSTALL_REQUIREMENTS = reqfile.read().split('\n')
 
 
@@ -30,16 +39,11 @@ def find_version():
     raise RuntimeError("Unable to find version string.")
 
 
-# The directory containing this file
-HERE = pathlib.Path(__file__).parent
-
-# The text of the README file
-README = (HERE / "README.md").read_text()
-
 setup(
     name='github2spec',
     version=find_version(),
-    description="A tool for building RPM's from github repo's with singleton binaries",
+    description="A tool for building RPM's from github repo's with singleton "
+                "binaries",
     long_description=README,
     long_description_content_type="text/markdown",
     url="https://github.com/MannemSolutions/rpmbuikder",
