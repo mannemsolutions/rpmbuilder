@@ -1,4 +1,4 @@
-name: Release workflow for tagged versions
+name: Release workflow for rpms
 on:
   push:
     # Sequence of patterns matched against refs/tags
@@ -32,24 +32,16 @@ jobs:
         mv ~/rpmbuild/RPMS/*/*.rpm rpms/
     - name: Sign RPMs
       run: |
-        cp config/rpmmacros ~/.rpmmacros
+        sed "s/PASSPHRASE/${{secrets.GPG_PASSPHRASE}}/" config/rpmmacros > ~/.rpmmacros
         echo "Importing pubkey..."
         cat gpg_pubkey.asc | gpg --import --no-tty --batch --yes
         echo "Importing seckey..."
         echo ${{secrets.GPG_KEY}} | base64 -d | gpg --import --no-tty --batch --yes
-        #echo "Listing public keys..."
-        #gpg --list-keys --with-keygrip
-        #echo "Listing secret keys..."
-        #gpg --list-secret-keys
-        echo "Resetting gpg-agent and ingesting passphrase..."
-        echo "allow-preset-passphrase" > ~/.gnupg/gpg-agent.conf
-        gpg-connect-agent RELOADAGENT /bye
-        echo "gpg-preset-passphrase..."
-        echo ${{secrets.GPG_PASSPHRASE}} | /usr/lib/gnupg2/gpg-preset-passphrase --preset ${{secrets.GPG_CACHEID}}
         echo "rpmsign --addsign..."
         rpmsign --addsign rpms/*.rpm
-    - name: Upload artifact
-      uses: actions/upload-artifact@v1.0.0
+    - name: Add to release
+      uses: softprops/action-gh-release@v1
       with:
-        name: Binary RPM
-        path: rpms
+        files: rpms/*.rpm
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
