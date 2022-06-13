@@ -20,7 +20,7 @@ HERE = pathlib.Path(__file__).parent
 INSTALL_REQUIREMENTS = (HERE / "requirements.txt").read_text().split('\n')
 
 # The text of the README file
-README = (HERE / "../README.md").read_text()
+README = (HERE / "README.md").read_text()
 
 with open(HERE / 'requirements.txt', encoding='utf-8') as reqfile:
     INSTALL_REQUIREMENTS = reqfile.read().split('\n')
