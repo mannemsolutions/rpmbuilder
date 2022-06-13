@@ -5,7 +5,7 @@ RUN yum update -y && \
 
 WORKDIR /usr/rpmbuilder
 
-COPY rpmbuilder /usr/rpmbuilder/
+COPY rpmbuilder README.md /usr/rpmbuilder/
 COPY scripts /
 
 RUN pip3 install --upgrade pip && pip install --no-cache-dir .
