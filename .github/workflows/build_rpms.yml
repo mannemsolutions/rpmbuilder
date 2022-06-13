@@ -26,9 +26,13 @@ jobs:
     - name: install rpmbuild
       run: sudo apt-get update -y && sudo apt-get install -y rpm
     - name: build RPM package
-      run: rpmbuild -ba "specs/${{matrix.spec}}.spec"
-    - name: set up gpg
       run: |
+        rpmbuild -ba "specs/${{matrix.spec}}.spec"
+        mkdir rpms
+        mv ~/rpmbuild/RPMS/*/*.rpm rpms/
+    - name: Sign RPMs
+      run: |
+        cp config/rpmmacros ~/.rpmmacros
         echo "Importing pubkey..."
         cat gpg_pubkey.asc | gpg --import --no-tty --batch --yes
         echo "Importing seckey..."
@@ -37,16 +41,15 @@ jobs:
         #gpg --list-keys --with-keygrip
         #echo "Listing secret keys..."
         #gpg --list-secret-keys
-        echo "Resetting gpg-agent and ingesting passphrase"
+        echo "Resetting gpg-agent and ingesting passphrase..."
         echo "allow-preset-passphrase" > ~/.gnupg/gpg-agent.conf
         gpg-connect-agent RELOADAGENT /bye
-        echo ${{secrets.GPG_PASSPHRASE}} | /usr/lib/gnupg2/gpg-preset-passphrase --preset ${{secrets.GPG_KEY}}
-    - name: Sign RPMs
-      run: |
-        cp config/rpmmacros ~/.rpmmacros
-        rpmsign --addsign ./rpms/*.rpm
-#    - name: Upload artifact
-#      uses: actions/upload-artifact@v1.0.0
-#      with:
-#        name: Binary RPM
-#        path: ${{ steps.rpm.outputs.rpm_dir_path }}
+        echo "gpg-preset-passphrase..."
+        echo ${{secrets.GPG_PASSPHRASE}} | /usr/lib/gnupg2/gpg-preset-passphrase --preset ${{secrets.GPG_CACHEID}}
+        echo "rpmsign --addsign..."
+        rpmsign --addsign rpms/*.rpm
+    - name: Upload artifact
+      uses: actions/upload-artifact@v1.0.0
+      with:
+        name: Binary RPM
+        path: rpms
