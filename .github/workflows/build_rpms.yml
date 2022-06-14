@@ -14,7 +14,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        spec: [etcd, stolon, wal-g-pg]
+        spec: [etcd, stolon, wal-g-pg, pgquartz, pgroute66]
     steps:
     - uses: actions/checkout@master
     - name: Set up Python
@@ -42,6 +42,10 @@ jobs:
     - name: Add to release
       uses: softprops/action-gh-release@v1
       with:
-        files: rpms/*.rpm
+        files: |
+          rpms/*.rpm
+          gpg_pubkey.asc
+          LICENSE
+          README.md
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
