@@ -16,6 +16,12 @@ install_dependencies:
 	pip install wheel twine
 	pip install -r rpmbuilder/requirements.txt
 
-build:
+build: install_dependencies publish
+
+update_specs:
+	docker-compose up -d
+	docker exec rpmbuilder_rpmbuilder_1 /usr/local/bin/github2spec
+
+publish:
 	python rpmbuilder/setup.py sdist bdist_wheel
 	twine check dist/*
