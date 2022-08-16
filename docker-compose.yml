@@ -8,4 +8,5 @@ services:
     - '-c'
     - 'while true; do sleep 1; done'
     volumes:
-    -  ./:/host
+    - ./:/host
+    - ./rpmbuilder/conf/github2spec.yaml:/usr/rpmbuilder/conf/github2spec.yaml
