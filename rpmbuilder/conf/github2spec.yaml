@@ -57,9 +57,6 @@ repositories:
     organization: etcd-io
     repository: etcd
     files:
-     - src: 'etcd-{{ version }}-linux-amd64/etcdutl'
-       dest: '%{_bindir}/etcdutl'
-       mode: '0755'
      - src: 'etcd-{{ version }}-linux-amd64/etcdctl'
        dest: '%{_bindir}/etcdctl'
        mode: '0755'
