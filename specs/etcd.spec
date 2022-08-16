@@ -20,7 +20,6 @@ curl -L https://github.com/etcd-io/etcd/releases/download/v3.4.20/etcd-v3.4.20-l
 mkdir -p %{buildroot}/%{_bindir}
 tar -xvf %{_sourcedir}/etcd-v3.4.20-linux-amd64.tar.gz
 
-%{__install} -m 0755 %{_builddir}/etcd-v3.4.20-linux-amd64/etcdutl %{buildroot}/%{_bindir}/etcdutl
 %{__install} -m 0755 %{_builddir}/etcd-v3.4.20-linux-amd64/etcdctl %{buildroot}/%{_bindir}/etcdctl
 %{__install} -m 0755 %{_builddir}/etcd-v3.4.20-linux-amd64/etcd %{buildroot}/%{_bindir}/etcd
 
@@ -29,6 +28,5 @@ tar -xvf %{_sourcedir}/etcd-v3.4.20-linux-amd64.tar.gz
 rm -rf $RPM_BUILD_ROOT
 
 %files
-%{_bindir}/etcdutl
 %{_bindir}/etcdctl
 %{_bindir}/etcd
