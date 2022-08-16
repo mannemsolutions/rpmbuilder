@@ -1,6 +1,14 @@
 template: /usr/rpmbuilder/templates/spec.j2
 dest: /host/specs
 repositories:
+  pgfga:
+    organization: mannemsolutions
+    repository: pgfga
+    asset_filter: 'pgfga-{{ version }}-linux-amd64.tar.gz$'
+    files:
+     - src: 'pgfga'
+       dest: '%{_bindir}/pgfga'
+       mode: '0755'
   pgroute66:
     organization: mannemsolutions
     repository: pgroute66
