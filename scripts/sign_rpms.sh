@@ -4,11 +4,15 @@ set -e
 [ ! -d /host/secrets ] && exit 0
 
 [ -e /host ] && DEST=/host || DEST=/tmp
+cd "$DEST"
 export RPMDEST=${RPMDEST:-${DEST}/rpms}
 
-cp /host/secrets/.rpmmacros ~/
-cat /host/gpg_pubkey.asc | gpg --import --no-tty --batch --yes
-cat /host/secrets/GPG_KEY | base64 -d | gpg --import --no-tty --batch --yes
-rpmsign --addsign "${RPMDEST}/"*.rpm
+sed "s/PASSPHRASE/${GPG_PASSPHRASE}/" config/rpmmacros >~/.rpmmacros
+echo "Importing pubkey..."
+gpg --import --no-tty --batch --yes <gpg_pubkey.asc
+echo "Importing seckey..."
+gpg --import --no-tty --batch --yes </host/secrets.org/GPG_KEY.bin
+echo "rpmsign --addsign..."
+rpmsign --addsign rpms/*.rpm
 
 echo Siging finished succesfully

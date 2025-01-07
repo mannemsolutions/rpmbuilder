@@ -3,63 +3,55 @@ dest: specs/
 repositories:
   pgfga:
     organization: mannemsolutions
-    repository: pgfga
-    asset_filter: 'pgfga-{{ version }}-linux-amd64.tar.gz$'
+    asset_filter: '{{ repository }}_{{ version }}_linux_{{ binary_arch }}.tar.gz$'
     files:
-     - src: 'pgfga'
-       dest: '%{_bindir}/pgfga'
-       mode: '0755'
+      - src: '{{ repository }}'
+        dest: '%{_bindir}/{{ repository }}'
+        mode: '0755'
+  pgav:
+    organization: mannemsolutions
+    asset_filter: '{{ repository }}_{{ version }}_Linux-{{ package_arch }}.tar.gz$'
+    files:
+      - src: '{{ repository }}'
+        dest: '%{_bindir}/{{ repository }}'
+        mode: '0755'
   pgroute66:
     organization: mannemsolutions
-    repository: pgroute66
-    asset_filter: 'pgroute66-{{ version }}-linux-amd64.tar.gz$'
+    asset_filter: '{{ repository }}_{{ version }}_linux_{{ binary_arch }}.tar.gz$'
     files:
-     - src: 'pgroute66'
-       dest: '%{_bindir}/pgroute66'
-       mode: '0755'
+      - src: '{{ repository }}'
+        dest: '%{_bindir}/{{ repository }}'
+        mode: '0755'
   pgquartz:
     organization: mannemsolutions
-    repository: pgquartz
-    asset_filter: 'pgquartz-{{ version }}-linux-amd64.tar.gz$'
+    asset_filter: '{{ repository }}_{{ version }}_linux_{{ binary_arch }}.tar.gz$'
     files:
-     - src: 'pgquartz'
-       dest: '%{_bindir}/pgquartz'
-       mode: '0755'
-  wal-g-pg:
-    license: Apache-2.0
-    repository: wal-g
-    # Yes, wal-g-pg-ubuntu-18.04-amd64.tar.gz is weird for a RH8 rpm, but ubuntu 18.04 has GLIB-C 2.26, and
-    # these work on RH8 (GLIB-C 2.28) too, where ubuntu20 is based on GLIB-C 2.29, and that does not work on RH8.
-    asset_filter: 'wal-g-pg-ubuntu-18.04-amd64.tar.gz$'
-    requires:
-      - glibc
-    files:
-     - src: 'wal-g-pg-ubuntu-18.04-amd64'
-       dest: '%{_bindir}/wal-g-pg'
-       mode: '0755'
+      - src: '{{ repository }}'
+        dest: '%{_bindir}/{{ repository }}'
+        mode: '0755'
   stolon:
-    organization: sorintlab
-    repository: stolon
+    organization: mannemsolutions
+    asset_filter: '{{ repository }}_{{ version }}_linux_{{ binary_arch }}.tar.gz$'
     files:
-     - src: 'stolon-{{ version }}-linux-amd64/bin/stolonctl'
-       dest: '%{_bindir}/stolonctl'
-       mode: '0755'
-     - src: 'stolon-{{ version }}*-linux-amd64/bin/stolon-sentinel'
-       dest: '%{_bindir}/stolon-sentinel'
-       mode: '0755'
-     - src: 'stolon-{{ version }}-linux-amd64/bin/stolon-proxy'
-       dest: '%{_bindir}/stolon-proxy'
-       mode: '0755'
-     - src: 'stolon-{{ version }}-linux-amd64/bin/stolon-keeper'
-       dest: '%{_bindir}/stolon-keeper'
-       mode: '0755'
+      - src: 'stolonctl'
+        dest: '%{_bindir}/stolonctl'
+        mode: '0755'
+      - src: 'stolon-sentinel'
+        dest: '%{_bindir}/stolon-sentinel'
+        mode: '0755'
+      - src: 'stolon-proxy'
+        dest: '%{_bindir}/stolon-proxy'
+        mode: '0755'
+      - src: 'stolon-keeper'
+        dest: '%{_bindir}/stolon-keeper'
+        mode: '0755'
   etcd:
     organization: etcd-io
-    repository: etcd
+    asset_filter: '{{ package_name }}-{{ version }}-linux-{{ binary_arch }}.tar.gz$'
     files:
-     - src: 'etcd-{{ version }}-linux-amd64/etcdctl'
-       dest: '%{_bindir}/etcdctl'
-       mode: '0755'
-     - src: 'etcd-{{ version }}-linux-amd64/etcd'
-       dest: '%{_bindir}/etcd'
-       mode: '0755'
+      - src: 'etcd-{{ version }}-linux-{{ binary_arch }}/etcdctl'
+        dest: '%{_bindir}/etcdctl'
+        mode: '0755'
+      - src: 'etcd-{{ version }}-linux-{{ binary_arch }}/etcd'
+        dest: '%{_bindir}/etcd'
+        mode: '0755'

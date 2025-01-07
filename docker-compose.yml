@@ -1,12 +1,29 @@
-version: '3.9'
 services:
-  rpmbuilder:
+  specgen:
     build: .
-    platform: linux/amd64
+    image: specgen
     command:
-    - bash
-    - '-c'
-    - 'while true; do sleep 1; done'
+      - /host/scripts/generate_specs.sh
     volumes:
-    - ./:/host
-    - ./rpmbuilder/conf/github2spec.yaml:/usr/rpmbuilder/conf/github2spec.yaml
+      - ./:/host
+  rpmbuilder:
+    image: specgen
+    command:
+      - /host/scripts/build_rpms.sh
+    volumes:
+      - ./:/host
+  rpmdownloader:
+    image: specgen
+    command:
+      - /host/scripts/download_rpms.sh
+    volumes:
+      - ./:/host
+  rpmsigner:
+    image: specgen
+    environment:
+      - GPG_PASSPHRASE
+      - GPG_KEY
+    command:
+      - /host/scripts/sign_rpms.sh
+    volumes:
+      - ./:/host

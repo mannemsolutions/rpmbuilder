@@ -1,67 +1,57 @@
 template: /usr/rpmbuilder/templates/spec.j2
-#dest: /host/specs
+#dest: /host/specs/
 repositories:
   pgfga:
     organization: mannemsolutions
-    asset_filter: '{{ repository }}-{{ version }}-linux-{{ binary_arch }}.tar.gz$'
+    asset_filter: '{{ repository }}_{{ version }}_linux_{{ binary_arch }}.tar.gz$'
     files:
-     - src: '{{ repository }}'
-       dest: '%{_bindir}/{{ repository }}'
-       mode: '0755'
+      - src: '{{ repository }}'
+        dest: '%{_bindir}/{{ repository }}'
+        mode: '0755'
+  pgav:
+    organization: mannemsolutions
+    asset_filter: '{{ repository }}_{{ version }}_Linux-{{ package_arch }}.tar.gz$'
+    files:
+      - src: '{{ repository }}'
+        dest: '%{_bindir}/{{ repository }}'
+        mode: '0755'
   pgroute66:
     organization: mannemsolutions
-    asset_filter: '{{ repository }}-{{ version }}-linux-{{ binary_arch }}.tar.gz$'
+    asset_filter: '{{ repository }}_{{ version }}_linux_{{ binary_arch }}.tar.gz$'
     files:
-     - src: '{{ repository }}'
-       dest: '%{_bindir}/{{ repository }}'
-       mode: '0755'
+      - src: '{{ repository }}'
+        dest: '%{_bindir}/{{ repository }}'
+        mode: '0755'
   pgquartz:
     organization: mannemsolutions
-    asset_filter: '{{ repository }}-{{ version }}-linux-{{ binary_arch }}.tar.gz$'
+    asset_filter: '{{ repository }}_{{ version }}_linux_{{ binary_arch }}.tar.gz$'
     files:
-     - src: '{{ repository }}'
-       dest: '%{_bindir}/{{ repository }}'
-       mode: '0755'
-  wal-g-pg:
-    organization: 'wal-g'
-    repository: 'wal-g'
-    license: Apache-2.0
-    version: v2.0.1bb
-    prep:
-      - 'bash /gobuild.sh -o sebasmannem -r {{ repository }} -t deps -t pg_build'
-    asset_filter: '{{ package_name }}-ubuntu-18.04-{{ binary_arch }}.tar.gz$'
-    requires:
-      - glibc
-    files:
-     - src: '{{ repository }}/main/pg/{{ repository }}'
-       dest: '%{_bindir}/{{ package_name }}'
-       mode: '0755'
+      - src: '{{ repository }}'
+        dest: '%{_bindir}/{{ repository }}'
+        mode: '0755'
   stolon:
-    version: v0.17.0b
-    prep:
-      - 'bash /gobuild.sh -o sebasmannem -r stolon'
-    organization: sorintlab
-    asset_filter: 'Source code'
+    organization: mannemsolutions
+    asset_filter: '{{ repository }}_{{ version }}_linux_{{ binary_arch }}.tar.gz$'
     files:
-     - src: '{{ repository }}/bin/stolonctl'
-       dest: '%{_bindir}/stolonctl'
-       mode: '0755'
-     - src: '{{ repository }}/bin/stolon-sentinel'
-       dest: '%{_bindir}/stolon-sentinel'
-       mode: '0755'
-     - src: '{{ repository }}/bin/stolon-proxy'
-       dest: '%{_bindir}/stolon-proxy'
-       mode: '0755'
-     - src: '{{ repository }}/bin/stolon-keeper'
-       dest: '%{_bindir}/stolon-keeper'
-       mode: '0755'
+      - src: 'stolonctl'
+        dest: '%{_bindir}/stolonctl'
+        mode: '0755'
+      - src: 'stolon-sentinel'
+        dest: '%{_bindir}/stolon-sentinel'
+        mode: '0755'
+      - src: 'stolon-proxy'
+        dest: '%{_bindir}/stolon-proxy'
+        mode: '0755'
+      - src: 'stolon-keeper'
+        dest: '%{_bindir}/stolon-keeper'
+        mode: '0755'
   etcd:
     organization: etcd-io
     asset_filter: '{{ package_name }}-{{ version }}-linux-{{ binary_arch }}.tar.gz$'
     files:
-     - src: 'etcd-{{ version }}-linux-{{ binary_arch }}/etcdctl'
-       dest: '%{_bindir}/etcdctl'
-       mode: '0755'
-     - src: 'etcd-{{ version }}-linux-{{ binary_arch }}/etcd'
-       dest: '%{_bindir}/etcd'
-       mode: '0755'
+      - src: 'etcd-{{ version }}-linux-{{ binary_arch }}/etcdctl'
+        dest: '%{_bindir}/etcdctl'
+        mode: '0755'
+      - src: 'etcd-{{ version }}-linux-{{ binary_arch }}/etcd'
+        dest: '%{_bindir}/etcd'
+        mode: '0755'
