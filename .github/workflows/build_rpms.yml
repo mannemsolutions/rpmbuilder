@@ -1,51 +1,48 @@
 name: Release workflow for rpms
 on:
+  workflow_dispatch:
   push:
     # Sequence of patterns matched against refs/tags
     tags:
       - 'v*' # Push events to matching v*, i.e. v0.2.19, v0.2.14a
-
-env:
-  GO_VERSION: 1.16
-  GITHUB2SPEC_CONFIG: config/github2spec.yaml
 
 jobs:
   build_rpms:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        spec: [etcd, stolon, wal-g-pg, pgquartz, pgroute66, pgfga]
+        arch:
+          - arm64
+          - amd64
     steps:
-    - uses: actions/checkout@master
-    - name: Set up Python
-      uses: actions/setup-python@v2
-    - name: install github2spec
-      run: cd rpmbuilder && pip install --upgrade pip && pip install --no-cache-dir .
-    - name: generate specs
-      run: github2spec
-    - name: install rpmbuild
-      run: sudo apt-get update -y && sudo apt-get install -y rpm
-    - name: build RPM package
-      run: |
-        rpmbuild -ba "specs/${{matrix.spec}}.spec"
-        mkdir rpms
-        mv ~/rpmbuild/RPMS/*/*.rpm rpms/
-    - name: Sign RPMs
-      run: |
-        sed "s/PASSPHRASE/${{secrets.GPG_PASSPHRASE}}/" config/rpmmacros > ~/.rpmmacros
-        echo "Importing pubkey..."
-        cat gpg_pubkey.asc | gpg --import --no-tty --batch --yes
-        echo "Importing seckey..."
-        echo ${{secrets.GPG_KEY}} | base64 -d | gpg --import --no-tty --batch --yes
-        echo "rpmsign --addsign..."
-        rpmsign --addsign rpms/*.rpm
-    - name: Add to release
-      uses: softprops/action-gh-release@v1
-      with:
-        files: |
-          rpms/*.rpm
-          gpg_pubkey.asc
-          LICENSE
-          README.md
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - uses: actions/checkout@master
+      - name: update to docker-compose v2
+        run: |
+          sudo apt-get install -y curl
+          sudo curl -SL https://github.com/docker/compose/releases/download/v2.3.3/docker-compose-linux-x86_64 -o /usr/local/bin/docker-compose
+          sudo chmod +x /usr/local/bin/docker-compose
+      - name: install compose
+        run: |
+          docker-compose --version
+          echo $PGVERSION
+      - name: generate specs
+        run: docker-compose up specgen
+      - name: build rpms
+        run: docker-compose up rpmbuilder
+      - name: download rpms
+        run: docker-compose up rpmdownloader
+      - name: sign rpms
+        run: docker-compose up rpmsigner
+        env:
+          GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
+          GPG_KEY: ${{ GPG_KEY }}
+      - name: Add to release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: |
+            rpms/*.rpm
+            gpg_pubkey.asc
+            LICENSE
+            README.md
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

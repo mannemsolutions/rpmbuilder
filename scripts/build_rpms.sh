@@ -7,16 +7,19 @@ export RPMDEST=${RPMDEST:-${DEST}/rpms}
 
 mkdir -p "${RPMDEST}"
 cd "${GITHUB2SPEC_DEST}"
-until [ -d .git ]; do
-  cd ..
-done
-
-git diff --name-only *-$(uname -i).spec | while read SPEC; do
-  rpmbuild -ba "${SPEC}"
+#until [ -d .git ]; do
+#  cd ..
+#done
+#
+#git diff --name-only *-$(uname -i).spec | while read SPEC; do
+#  rpmbuild -ba "${SPEC}"
+#done
+find "${GITHUB2SPEC_DEST}/" -name '*.spec' | while read -r SPEC; do
+	rpmbuild -ba "${SPEC}"
 done
 
 for RPM in ~/rpmbuild/RPMS/*/*.rpm; do
- cp "${RPM}" "${RPMDEST}"
+	cp "${RPM}" "${RPMDEST}"
 done
 
 echo Building rpms finished succesfully
