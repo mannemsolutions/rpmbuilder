@@ -1,7 +1,7 @@
-FROM rockylinux:9
+FROM --platform=${BUILDPLATFORM} rockylinux:9
 
 RUN dnf update -y && \
-    dnf install -y python3-pip sudo make pinentry rpmdevtools rpm-build rpm-sign cmake bind-utils git iproute golang && \
+    dnf install -y python3-pip sudo make pinentry rpmdevtools rpm-build rpm-sign cmake bind-utils git iproute golang jq && \
     dnf groupinstall -y "Development Tools"
 
 WORKDIR /usr/rpmbuilder

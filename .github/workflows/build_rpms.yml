@@ -45,11 +45,6 @@ jobs:
         env:
           DOCKER_DEFAULT_PLATFORM: linux/${{ matrix.arch }}
           DOCKER_BUILDKIT: 1
-      - name: download rpms
-        run: docker-compose up rpmdownloader --exit-code-from rpmdownloader
-        env:
-          DOCKER_DEFAULT_PLATFORM: linux/${{ matrix.arch }}
-          DOCKER_BUILDKIT: 1
       - name: sign rpms
         run: docker-compose up rpmsigner --exit-code-from rpmsigner
         env:
@@ -57,6 +52,37 @@ jobs:
           GPG_KEY: ${{ secrets.GPG_KEY }}
           DOCKER_DEFAULT_PLATFORM: linux/${{ matrix.arch }}
           DOCKER_BUILDKIT: 1
+      - name: Add to release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: |
+            rpms/*.rpm
+            gpg_pubkey.asc
+            LICENSE
+            README.md
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  download_rpms:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@master
+      - name: update to docker-compose v2
+        run: |
+          sudo apt-get install -y curl
+          sudo curl -SL https://github.com/docker/compose/releases/download/v2.3.3/docker-compose-linux-x86_64 -o /usr/local/bin/docker-compose
+          sudo chmod +x /usr/local/bin/docker-compose
+      - name: install compose
+        run: |
+          docker-compose --version
+          echo $PGVERSION
+      - name: download rpms
+        run: docker-compose up rpmdownloader --exit-code-from rpmdownloader
+      - name: sign rpms
+        run: docker-compose up rpmsigner --exit-code-from rpmsigner
+        env:
+          GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
+          GPG_KEY: ${{ secrets.GPG_KEY }}
       - name: Add to release
         uses: softprops/action-gh-release@v1
         with:
