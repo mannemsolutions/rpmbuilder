@@ -1,25 +1,26 @@
 services:
   specgen:
-    build: .
-    image: specgen
+    build:
+      context: .
+      dockerfile: docker/specgen/Dockerfile
     command:
       - /host/scripts/generate_specs.sh
     volumes:
       - ./:/host
   rpmbuilder:
-    image: specgen
+    build: docker/rpmtools
     command:
       - /host/scripts/build_rpms.sh
     volumes:
       - ./:/host
   rpmdownloader:
-    image: specgen
+    build: docker/rpmtools
     command:
       - /host/scripts/download_rpms.sh
     volumes:
       - ./:/host
   rpmsigner:
-    image: specgen
+    build: docker/rpmtools
     environment:
       - GPG_PASSPHRASE
       - GPG_KEY
