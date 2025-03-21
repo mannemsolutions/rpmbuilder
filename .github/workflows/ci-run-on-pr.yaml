@@ -26,3 +26,5 @@ jobs:
           docker-compose up specgen --exit-code-from specgen
       - name: build rpms
         run: docker-compose up rpmbuilder --exit-code-from rpmbuilder
+        env:
+          BASEIMAGE: rockylinux:9

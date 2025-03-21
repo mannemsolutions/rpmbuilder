@@ -1,4 +1,5 @@
-FROM rockylinux:9
+ARG BASEIMAGE=dontknow:dontcare
+FROM ${BASEIMAGE}
 
 RUN dnf update -y && \
     dnf install -y pinentry rpmdevtools rpm-build rpm-sign jq
