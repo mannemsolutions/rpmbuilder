@@ -1,0 +1,28 @@
+name: CI/CD for config changes
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
+
+permissions:
+  contents: read
+
+jobs:
+  check_config:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@master
+      - name: update to docker-compose v2
+        run: |
+          sudo apt-get install -y curl
+          sudo curl -SL https://github.com/docker/compose/releases/download/v2.3.3/docker-compose-linux-x86_64 -o /usr/local/bin/docker-compose
+          sudo chmod +x /usr/local/bin/docker-compose
+          docker-compose --version
+      - name: create folders as required
+        run: |
+          mkdir -p rpms specs
+          chmod 777 rpms specs
+      - name: generate specs
+        run: |
+          docker-compose up specgen --exit-code-from specgen
+      - name: build rpms
+        run: docker-compose up rpmbuilder --exit-code-from rpmbuilder

@@ -49,7 +49,7 @@ setup(
     url="https://github.com/MannemSolutions/rpmbuikder",
     author="Sebastiaan Mannem",
     author_email="sebas@mannemsolutions.nl",
-    license="GPL-3.0 License",
+    license="GPL-3.0-or-later",
     classifiers=[
         "License :: OSI Approved :: GNU General Public License v3 (GPLv3)",
         "Programming Language :: Python :: 3",

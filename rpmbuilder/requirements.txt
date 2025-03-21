@@ -1,8 +1,8 @@
-certifi==2021.10.8
-charset-normalizer==2.0.12
-idna==2.10
-Jinja2==3.1.5
-MarkupSafe==2.1.0
-PyYAML==6.0
-requests==2.25.1
-urllib3==1.26.8
+certifi
+charset-normalizer
+idna
+Jinja2
+MarkupSafe
+PyYAML
+requests
+urllib3

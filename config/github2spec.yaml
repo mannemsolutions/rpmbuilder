@@ -1,5 +1,5 @@
-template: ./rpmbuilder/templates/spec.j2
-dest: specs/
+template: /host/rpmbuilder/templates/spec.j2
+dest: /host/specs/
 repositories:
   pgfga:
     organization: mannemsolutions
