@@ -29,6 +29,13 @@ repositories:
       - src: '{{ repository }}'
         dest: '%{_bindir}/{{ repository }}'
         mode: '0755'
+  pgcustodian:
+    organization: mannemsolutions
+    asset_filter: '{{ repository }}_{{ version }}_linux_{{ binary_arch }}.tar.gz$'
+    files:
+      - src: '{{ repository }}'
+        dest: '%{_bindir}/{{ repository }}'
+        mode: '0755'
   stolon:
     organization: mannemsolutions
     asset_filter: '{{ repository }}_{{ version }}_linux_{{ binary_arch }}.tar.gz$'
