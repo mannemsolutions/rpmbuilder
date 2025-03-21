@@ -2,11 +2,13 @@ services:
   specgen:
     build:
       context: .
-      dockerfile: docker/specgen/Dockerfile
+      dockerfile: Dockerfile.specgen
     command:
       - /host/scripts/generate_specs.sh
     volumes:
       - ./:/host
+    environment:
+      GITHUB2SPEC_CONFIG: /host/config/github2spec.yaml
   rpmbuilder:
     build: docker/rpmtools
     command:
