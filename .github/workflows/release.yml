@@ -1,6 +1,6 @@
 name: Release workflow for tagged versions
 on:
-  workflow_dispatch:
+  #workflow_dispatch:
   release:
     types:
       - published
@@ -68,10 +68,11 @@ jobs:
           DOCKER_BUILDKIT: 1
           BASEIMAGE: "${{ matrix.baseimage }}"
 
-      - name: Upload artifact
-        uses: actions/upload-artifact@v4
+      - name: Add rpm's to release
+        uses: softprops/action-gh-release@c95fe1489396fe8a9eb87c0abf8aa5b2ef267fda # v2.2.1
         with:
-          path: rpms/*
+          files: |
+            rpms/*
 
   download_rpms:
     runs-on: ubuntu-latest
@@ -94,7 +95,7 @@ jobs:
         run: |
           docker-compose up rpmdownloader --exit-code-from rpmdownloader
         env:
-          DOCKER_DEFAULT_PLATFORM: linux/${{ matrix.arch }}
+          DOCKER_DEFAULT_PLATFORM: linux/amd64
           DOCKER_BUILDKIT: 1
           BASEIMAGE: rockylinux:9
 
@@ -102,12 +103,12 @@ jobs:
         run: |
           docker-compose up rpmsigner --exit-code-from rpmsigner
         env:
-          DOCKER_DEFAULT_PLATFORM: linux/${{ matrix.arch }}
+          DOCKER_DEFAULT_PLATFORM: linux/amd64
           DOCKER_BUILDKIT: 1
           BASEIMAGE: rockylinux:9
 
-      - name: Upload artifact
-        uses: actions/upload-artifact@v4
+      - name: Add rpm's to release
+        uses: softprops/action-gh-release@c95fe1489396fe8a9eb87c0abf8aa5b2ef267fda # v2.2.1
         with:
-          path: |
+          files: |
             rpms/*
