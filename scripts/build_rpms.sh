@@ -1,5 +1,5 @@
 #!/bin/bash
-set -e
+set -ex
 
 [ -e /host ] && DEST=/host || DEST=/tmp
 export GITHUB2SPEC_DEST=${GITHUB2SPEC_DEST:-${DEST}/specs}

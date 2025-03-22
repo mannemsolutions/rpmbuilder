@@ -14,7 +14,7 @@ echo -n "myspecs="
 		echo -n "\"${img}\""
 	done
 	echo "],"
-	echo "\"specs\":["
+	echo "\"spec\":["
 	i=0
 	for spec in specs/*; do
 		i+=1
