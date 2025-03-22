@@ -51,6 +51,11 @@ jobs:
           #  version: "42"
           #  arch: amd64
     runs-on: ubuntu-latest
+    services:
+      registry:
+        image: registry:2
+        ports:
+          - 5000:5000
     steps:
       - uses: actions/checkout@v4
 
@@ -62,27 +67,18 @@ jobs:
       - name: Set up Docker Buildx
         id: buildx
         uses: docker/setup-buildx-action@6524bf65af31da8d45b59e8c27de4bd072b392f5 # v3.8.0
-
-      - name: Docker meta
-        id: meta
-        uses: docker/metadata-action@v5
         with:
-          images: |
-            name=builder-${{ matrix.baseimage }},enable=true
-          tags: |
-            type=raw,value=${{ matrix.version }}
+          driver-opts: network=host
 
       - name: Build image
         uses: docker/build-push-action@v6
         with:
           context: docker/rpmtools
-          push: false
-          load: true
+          push: true
           platforms: 'linux/${{ matrix.arch }}'
-          tags: ${{ steps.meta.outputs.tags }}
-          labels: ${{ steps.meta.outputs.labels }}
           build-args: |
             BASEIMAGE=${{ matrix.baseimage }}:${{ matrix.version }}
+          tags: localhost:5000/builder-${{ matrix.baseimage }}:${{ matrix.version }}
 
   build_specs:
     strategy:
@@ -142,6 +138,13 @@ jobs:
     needs:
       - builder_images
       - build_specs
+    env:
+      BASEIMAGE: "${{ matrix.baseimage }}"
+    services:
+      registry:
+        image: registry:2
+        ports:
+          - 5000:5000
     steps:
       - uses: actions/checkout@v4
 
@@ -166,13 +169,18 @@ jobs:
           sudo chmod +x /usr/local/bin/docker-compose
           docker-compose --version
 
+      - name: pull and tag image
+        run: |
+          docker pull localhost:5000/builder-${{ env.BASEIMAGE }}
+          docker tag localhost:5000/builder-${{ env.BASEIMAGE }} builder-${{ env.BASEIMAGE }}
+
       - name: build rpm
         run: |
           docker-compose up rpmbuilder --exit-code-from rpmbuilder
+
         env:
           DOCKER_DEFAULT_PLATFORM: linux/${{ matrix.arch }}
           DOCKER_BUILDKIT: 1
-          BASEIMAGE: "${{ matrix.baseimage }}"
 
       - name: sign rpm's
         run: |
@@ -189,6 +197,13 @@ jobs:
     runs-on: ubuntu-latest
     needs:
       - builder_images
+    env:
+      BASEIMAGE: rockylinux:9
+    services:
+      registry:
+        image: registry:2
+        ports:
+          - 5000:5000
     steps:
       - uses: actions/checkout@v4
 
@@ -204,9 +219,16 @@ jobs:
           mkdir -p rpms
           chmod 777 rpms
 
+      - name: pull and tag image
+        run: |
+          docker pull localhost:5000/builder-${{ env.BASEIMAGE }}
+          docker tag localhost:5000/builder-${{ env.BASEIMAGE }} builder-${{ env.BASEIMAGE }}
+
       - name: download rpm's
         run: |
           docker-compose up rpmdownloader --exit-code-from rpmdownloader
+        env:
+          BASEIMAGE: "rockylinux:9"
 
       - name: sign rpm's
         run: |
