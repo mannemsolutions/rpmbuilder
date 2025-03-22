@@ -10,8 +10,8 @@ jobs:
   check_config:
     runs-on: ubuntu-latest
     env:
-      BASEIMAGE: rockylinux:9
-      IMAGETAG: builder-rockylinux:9
+      BASEIMAGE: fedora:42
+      IMAGETAG: builder-fedora:42
     steps:
       - uses: actions/checkout@master
       - name: update to docker-compose v2
