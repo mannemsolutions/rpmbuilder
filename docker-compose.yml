@@ -12,13 +12,13 @@ services:
   rpmbuilder:
     image: builder-${BASEIMAGE}
   rpmdownloader:
-    image: builder-rockylinux:9
+    image: builder-${BASEIMAGE}
     command:
       - /host/scripts/download_rpms.sh
     volumes:
       - ./:/host
   rpmsigner:
-    image: builder-rockylinux:9
+    image: builder-${BASEIMAGE}
     command:
       - /host/scripts/sign_rpms.sh
     volumes:

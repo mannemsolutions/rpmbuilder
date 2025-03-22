@@ -2,12 +2,10 @@
 echo -n "myspecs="
 {
 	echo "{"
-	#echo "\"arch\":[\"arm64\",\"amd64\"],"
-	echo "\"arch\":[\"amd64\"],"
+	echo "\"arch\":[\"arm64\",\"amd64\"],"
 	echo "\"baseimage\":["
 	i=0
-	#for img in rockylinux:{8,9} fedora:{39..42}; do
-	for img in rockylinux:9; do
+	for img in rockylinux:{8,9} fedora:{39..42}; do
 		i+=1
 		if [ "$i" -gt "1" ]; then
 			echo -n ","

@@ -9,6 +9,9 @@ permissions:
 jobs:
   check_config:
     runs-on: ubuntu-latest
+    env:
+      BASEIMAGE: rockylinux:9
+      IMAGETAG: builder-rockylinux:9
     steps:
       - uses: actions/checkout@master
       - name: update to docker-compose v2
@@ -21,10 +24,15 @@ jobs:
         run: |
           mkdir -p rpms specs
           chmod 777 rpms specs
+      - name: Build image
+        uses: docker/build-push-action@v6
+        with:
+          context: docker/rpmtools
+          build-args: |
+            BASEIMAGE=${{ env.BASEIMAGE }}
+          tags: ${{ env.IMAGETAG }}
       - name: generate specs
         run: |
           docker-compose up specgen --exit-code-from specgen
       - name: build rpms
         run: docker-compose up rpmbuilder --exit-code-from rpmbuilder
-        env:
-          BASEIMAGE: rockylinux:9

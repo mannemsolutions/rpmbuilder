@@ -1,7 +1,7 @@
 name: Release workflow for tagged versions
 on:
-  pull_request:
-    types: [opened, synchronize, reopened, ready_for_review]
+  #pull_request:
+  #  types: [opened, synchronize, reopened, ready_for_review]
   release:
     types:
       - published
@@ -14,42 +14,45 @@ jobs:
     strategy:
       matrix:
         include:
-          #- baseimage: rockylinux
-          #  version: "8"
-          #  arch: arm64
-          #- baseimage: rockylinux
-          #  version: "9"
-          #  arch: arm64
-          #- baseimage: fedora
-          #  version: "39"
-          #  arch: arm64
-          #- baseimage: fedora
-          #  version: "40"
-          #  arch: arm64
-          #- baseimage: fedora
-          #  version: "41"
-          #  arch: arm64
-          #- baseimage: fedora
-          #  version: "42"
-          #  arch: arm64
-          #- baseimage: rockylinux
-          #  version: "8"
-          #  arch: amd64
+          - baseimage: rockylinux
+            version: "8"
+            arch: arm64
+          - baseimage: rockylinux
+            version: "9"
+            arch: arm64
+          - baseimage: fedora
+            version: "39"
+            arch: arm64
+          - baseimage: fedora
+            version: "40"
+            arch: arm64
+          - baseimage: fedora
+            version: "41"
+            arch: arm64
+          - baseimage: fedora
+            version: "42"
+            arch: arm64
+          - baseimage: rockylinux
+            version: "8"
+            arch: amd64
           - baseimage: rockylinux
             version: "9"
             arch: amd64
-          #- baseimage: fedora
-          #  version: "39"
-          #  arch: amd64
-          #- baseimage: fedora
-          #  version: "40"
-          #  arch: amd64
-          #- baseimage: fedora
-          #  version: "41"
-          #  arch: amd64
-          #- baseimage: fedora
-          #  version: "42"
-          #  arch: amd64
+          - baseimage: fedora
+            version: "39"
+            arch: amd64
+          - baseimage: fedora
+            version: "40"
+            arch: amd64
+          - baseimage: fedora
+            version: "41"
+            arch: amd64
+          - baseimage: fedora
+            version: "42"
+            arch: amd64
+    env:
+      IMAGEARTIFACT: builder-${{ matrix.baseimage }}-${{ matrix.version }}
+      IMAGETAG: builder-${{ matrix.baseimage }}:${{ matrix.version }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -62,33 +65,30 @@ jobs:
       - name: Set up Docker Buildx
         id: buildx
         uses: docker/setup-buildx-action@6524bf65af31da8d45b59e8c27de4bd072b392f5 # v3.8.0
-
-      - name: Docker meta
-        id: meta
-        uses: docker/metadata-action@v5
         with:
-          images: |
-            name=builder-${{ matrix.baseimage }},enable=true
-          tags: |
-            type=raw,value=${{ matrix.version }}
+          driver-opts: network=host
 
       - name: Build image
         uses: docker/build-push-action@v6
         with:
           context: docker/rpmtools
-          push: false
-          load: true
           platforms: 'linux/${{ matrix.arch }}'
-          tags: ${{ steps.meta.outputs.tags }}
-          labels: ${{ steps.meta.outputs.labels }}
           build-args: |
             BASEIMAGE=${{ matrix.baseimage }}:${{ matrix.version }}
+          tags: ${{ env.IMAGETAG }}
+          outputs: type=docker,dest=${{ runner.temp }}/myimage.tar
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ env.IMAGEARTIFACT }}
+          path: ${{ runner.temp }}/myimage.tar
 
   build_specs:
     strategy:
       matrix:
         arch:
-          #- arm64
+          - arm64
           - amd64
     runs-on: ubuntu-latest
     outputs:
@@ -142,6 +142,14 @@ jobs:
     needs:
       - builder_images
       - build_specs
+    env:
+      IMAGETAG: builder-${{ matrix.baseimage }}
+      BASEIMAGE: "${{ matrix.baseimage }}"
+    services:
+      registry:
+        image: registry:2
+        ports:
+          - 5000:5000
     steps:
       - uses: actions/checkout@v4
 
@@ -166,13 +174,27 @@ jobs:
           sudo chmod +x /usr/local/bin/docker-compose
           docker-compose --version
 
+      - id: artifact_name
+        run: |
+          echo "name=$(echo ${IMAGETAG} | sed 's/:/-/')" >> $GITHUB_OUTPUT
+
+      - name: Download artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: ${{ steps.artifact_name.outputs.name }}
+          path: ${{ runner.temp }}
+
+      - name: load image
+        run: |
+          docker load --input ${{ runner.temp }}/myimage.tar
+
       - name: build rpm
         run: |
           docker-compose up rpmbuilder --exit-code-from rpmbuilder
+
         env:
           DOCKER_DEFAULT_PLATFORM: linux/${{ matrix.arch }}
           DOCKER_BUILDKIT: 1
-          BASEIMAGE: "${{ matrix.baseimage }}"
 
       - name: sign rpm's
         run: |
@@ -189,6 +211,16 @@ jobs:
     runs-on: ubuntu-latest
     needs:
       - builder_images
+    strategy:
+      matrix:
+        include:
+          - baseimage: rockylinux
+            version: "9"
+            arch: amd64
+    env:
+      IMAGEARTIFACT: builder-${{ matrix.baseimage }}-${{ matrix.version }}
+      IMAGETAG: builder-${{ matrix.baseimage }}:${{ matrix.version }}
+      BASEIMAGE: ${{ matrix.baseimage }}:${{ matrix.version }}
     steps:
       - uses: actions/checkout@v4
 
@@ -204,9 +236,21 @@ jobs:
           mkdir -p rpms
           chmod 777 rpms
 
+      - name: Download artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: ${{ env.IMAGEARTIFACT }}
+          path: ${{ runner.temp }}
+
+      - name: load image
+        run: |
+          docker load --input ${{ runner.temp }}/myimage.tar
+
       - name: download rpm's
         run: |
           docker-compose up rpmdownloader --exit-code-from rpmdownloader
+        env:
+          BASEIMAGE: "rockylinux:9"
 
       - name: sign rpm's
         run: |
