@@ -10,30 +10,15 @@ services:
     environment:
       GITHUB2SPEC_CONFIG: /host/config/github2spec.yaml
   rpmbuilder:
-    build:
-      context: docker/rpmtools
-      args:
-        - BASEIMAGE
-    command:
-      - /host/scripts/build_rpms.sh
-    volumes:
-      - ./:/host
+    image: builder-${BASEIMAGE}
   rpmdownloader:
-    build:
-      context: docker/rpmtools
-      args:
-        - BASEIMAGE
+    image: builder-${BASEIMAGE}
     command:
       - /host/scripts/download_rpms.sh
     volumes:
       - ./:/host
-    environment:
-      - BASEIMAGE
   rpmsigner:
-    build:
-      context: docker/rpmtools
-      args:
-        - BASEIMAGE
+    image: builder-${BASEIMAGE}
     command:
       - /host/scripts/sign_rpms.sh
     volumes:
@@ -41,4 +26,3 @@ services:
     environment:
       - GPG_PASSPHRASE
       - GPG_KEY
-      - BASEIMAGE
