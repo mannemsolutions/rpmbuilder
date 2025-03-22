@@ -1,7 +1,9 @@
 ARG BASEIMAGE=dontknow:dontcare
 FROM ${BASEIMAGE}
 
-RUN dnf update -y && \
+RUN mkdir -p /etc/dnf/libdnf5.conf.d/ && \
+    echo -e  '[main]\nfastestmirrors=true ' > /etc/dnf/libdnf5.conf.d/80-local.conf && \
+    dnf update -y && \
     dnf install -y pinentry rpmdevtools rpm-build rpm-sign jq
 
 WORKDIR /usr/rpmbuilder
