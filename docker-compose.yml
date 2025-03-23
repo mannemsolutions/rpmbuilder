@@ -11,6 +11,10 @@ services:
       GITHUB2SPEC_CONFIG: /host/config/github2spec.yaml
   rpmbuilder:
     image: builder-${BASEIMAGE}
+    command:
+      - /host/scripts/build_rpms.sh
+    volumes:
+      - ./:/host
   rpmdownloader:
     image: builder-${BASEIMAGE}
     command:
