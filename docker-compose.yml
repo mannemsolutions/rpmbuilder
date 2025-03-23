@@ -10,19 +10,19 @@ services:
     environment:
       GITHUB2SPEC_CONFIG: /host/config/github2spec.yaml
   rpmbuilder:
-    image: builder-${BASEIMAGE}
+    image: ${IMAGETAG}
     command:
       - /host/scripts/build_rpms.sh
     volumes:
       - ./:/host
   rpmdownloader:
-    image: builder-${BASEIMAGE}
+    image: ${IMAGETAG}
     command:
       - /host/scripts/download_rpms.sh
     volumes:
       - ./:/host
   rpmsigner:
-    image: builder-${BASEIMAGE}
+    image: ${IMAGETAG}
     command:
       - /host/scripts/sign_rpms.sh
     volumes:

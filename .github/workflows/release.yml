@@ -88,9 +88,8 @@ jobs:
         arch:
           - arm64
           - amd64
+      IMAGETAG: builder-${{ matrix.baseimage }}:${{ matrix.version }}
     runs-on: ubuntu-latest
-    outputs:
-      myspecs: ${{ steps.spec_matrix.outputs.myspecs }}
     steps:
       - uses: actions/checkout@v4
 
@@ -127,22 +126,42 @@ jobs:
           name: ${{ matrix.arch }}-specs
           path: specs/
 
-      - id: spec_matrix
-        run: |
-          scripts/speclist_as_json.sh >> $GITHUB_OUTPUT
+  build_matrix:
+    needs:
+      - build_specs
+    outputs:
+      mymatrix: ${{ steps.matrix.outputs.mymatrix }}
+    runs-on: ubuntu-latest
+    steps:
 
+      - uses: actions/checkout@v4
+
+      - uses: actions/download-artifact@v4
+        with:
+          name: arm64-specs
+          path: specs/
+
+      - uses: actions/download-artifact@v4
+        with:
+          name: amd64-specs
+          path: specs/
+
+      - id: matrix
+        run: |
+          python scripts/speclist_as_json.py
+          python scripts/speclist_as_json.py >> $GITHUB_OUTPUT
 
   build_rpms:
     strategy:
-      matrix: ${{ fromJson(needs.build_specs.outputs.myspecs) }}
+      matrix: ${{ fromJson(needs.build_matrix.outputs.mymatrix) }}
 
     runs-on: ubuntu-latest
     needs:
       - builder_images
-      - build_specs
+      - build_matrix
     env:
-      IMAGETAG: builder-${{ matrix.baseimage }}
-      BASEIMAGE: "${{ matrix.baseimage }}"
+      IMAGETAG: builder-${{ matrix.baseimage }}:${{ matrix.version }}
+      IMAGEARTIFACT: builder-${{ matrix.baseimage }}-${{ matrix.version }}-${{ matrix.arch }}
     services:
       registry:
         image: registry:2
@@ -154,7 +173,7 @@ jobs:
       - uses: actions/download-artifact@v4
         with:
           name: ${{ matrix.arch }}-specs
-          path: all/specs/
+          path: all/
 
       - name: copy the spec to the place
         run: |
@@ -177,14 +196,10 @@ jobs:
           sudo chmod +x /usr/local/bin/docker-compose
           docker-compose --version
 
-      - id: image_artifact_name
-        run: |
-          echo "name=$(echo ${IMAGETAG} | sed 's/:/-/')-${{ matrix.arch }}" >> $GITHUB_OUTPUT
-
       - name: Download artifact
         uses: actions/download-artifact@v4
         with:
-          name: ${{ steps.image_artifact_name.outputs.name }}
+          name: ${{ env.IMAGEARTIFACT }}
           path: ${{ runner.temp }}
 
       - name: load image
@@ -222,13 +237,12 @@ jobs:
     strategy:
       matrix:
         include:
-          - baseimage: rockylinux
-            version: "9"
+          - baseimage: fedora
+            version: "42"
             arch: amd64
     env:
       IMAGEARTIFACT: builder-${{ matrix.baseimage }}-${{ matrix.version }}-${{ matrix.arch }}
       IMAGETAG: builder-${{ matrix.baseimage }}:${{ matrix.version }}
-      BASEIMAGE: ${{ matrix.baseimage }}:${{ matrix.version }}
     steps:
       - uses: actions/checkout@v4
 
@@ -257,8 +271,6 @@ jobs:
       - name: download rpm's
         run: |
           docker-compose up rpmdownloader --exit-code-from rpmdownloader
-        env:
-          BASEIMAGE: "rockylinux:9"
 
       - name: sign rpm's
         run: |
