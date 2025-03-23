@@ -1,7 +1,5 @@
 name: Release workflow for tagged versions
 on:
-  pull_request:
-    types: [opened, synchronize, reopened, ready_for_review]
   release:
     types:
       - published
@@ -16,40 +14,40 @@ jobs:
         include:
           - baseimage: rockylinux
             version: "8"
-            arch: arm64
+            arch: amd64
           - baseimage: rockylinux
             version: "9"
-            arch: arm64
+            arch: amd64
           - baseimage: fedora
             version: "39"
-            arch: arm64
+            arch: amd64
           - baseimage: fedora
             version: "40"
-            arch: arm64
+            arch: amd64
           - baseimage: fedora
             version: "41"
-            arch: arm64
+            arch: amd64
           - baseimage: fedora
             version: "42"
-            arch: arm64
+            arch: amd64
           - baseimage: rockylinux
             version: "8"
-            arch: amd64
+            arch: arm64
           - baseimage: rockylinux
             version: "9"
-            arch: amd64
+            arch: arm64
           - baseimage: fedora
             version: "39"
-            arch: amd64
+            arch: arm64
           - baseimage: fedora
             version: "40"
-            arch: amd64
+            arch: arm64
           - baseimage: fedora
             version: "41"
-            arch: amd64
+            arch: arm64
           - baseimage: fedora
             version: "42"
-            arch: amd64
+            arch: arm64
     env:
       IMAGEARTIFACT: builder-${{ matrix.baseimage }}-${{ matrix.version }}-${{ matrix.arch }}
       IMAGETAG: builder-${{ matrix.baseimage }}:${{ matrix.version }}
@@ -112,7 +110,7 @@ jobs:
           sudo chmod +x /usr/local/bin/docker-compose
           docker-compose --version
 
-      - name: create folders as required
+      - name: create rpms and specs folders as required
         run: |
           mkdir -p rpms specs
           chmod 777 rpms specs
@@ -156,12 +154,12 @@ jobs:
       - uses: actions/download-artifact@v4
         with:
           name: ${{ matrix.arch }}-specs
-          path: specs.all/
+          path: all/specs/
 
       - name: copy the spec to the place
         run: |
           mkdir -p specs
-          cp specs.all/${{ matrix.spec }} specs/
+          cp all/${{ matrix.spec }} specs/
 
       # https://github.com/docker/setup-qemu-action
       - name: Set up QEMU
@@ -179,19 +177,24 @@ jobs:
           sudo chmod +x /usr/local/bin/docker-compose
           docker-compose --version
 
-      - id: artifact_name
+      - id: image_artifact_name
         run: |
           echo "name=$(echo ${IMAGETAG} | sed 's/:/-/')-${{ matrix.arch }}" >> $GITHUB_OUTPUT
 
       - name: Download artifact
         uses: actions/download-artifact@v4
         with:
-          name: ${{ steps.artifact_name.outputs.name }}
+          name: ${{ steps.image_artifact_name.outputs.name }}
           path: ${{ runner.temp }}
 
       - name: load image
         run: |
           docker load --input ${{ runner.temp }}/myimage.tar
+
+      - name: create rpms folder as required
+        run: |
+          mkdir -p rpms
+          chmod 777 rpms
 
       - name: build rpm
         run: |
@@ -236,7 +239,7 @@ jobs:
           sudo chmod +x /usr/local/bin/docker-compose
           docker-compose --version
 
-      - name: create folders as required
+      - name: create rpms folder as required
         run: |
           mkdir -p rpms
           chmod 777 rpms
