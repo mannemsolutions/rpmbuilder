@@ -1,17 +1,16 @@
 #!/bin/bash
 set -e
 
-[ ! -d /host/secrets ] && exit 0
-
-[ -e /host ] && DEST=/host || DEST=/tmp
+DEST=${DEST:-/host}
 cd "$DEST"
 export RPMDEST=${RPMDEST:-${DEST}/rpms}
+export GPG_TTY=$(tty)
 
 sed "s/PASSPHRASE/${GPG_PASSPHRASE}/" config/rpmmacros >~/.rpmmacros
 echo "Importing pubkey..."
 gpg --import --no-tty --batch --yes <gpg_pubkey.asc
 echo "Importing seckey..."
-gpg --import --no-tty --batch --yes </host/secrets.org/GPG_KEY.bin
+echo "${GPG_KEY_B64}" | base64 -d | gpg --import --no-tty --batch --yes
 echo "rpmsign --addsign..."
 rpmsign --addsign rpms/*.rpm
 

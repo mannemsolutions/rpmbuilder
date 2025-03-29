@@ -22,4 +22,6 @@ for RPM in ~/rpmbuild/RPMS/*/*.rpm; do
 	cp "${RPM}" "${RPMDEST}"
 done
 
+ls "${RPMDEST}/"*.rpm
+
 echo Building rpms finished succesfully
