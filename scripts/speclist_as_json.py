@@ -13,9 +13,7 @@ amdspecs = [f for f in listdir('./specs') if isfile(join('./specs', f)) if 'x86_
 
 arches =['amd64','arm64']
 images = [ ('fedora',str(version)) for version in range(39,43)]
-print(len(images))
 images += [ ('rockylinux',str(version)) for version in range(8,10)]
-print(len(images))
 
 matrix = [ {'arch': 'amd64', 'baseimage': base, 'version': version, 'spec': spec}
     for spec in amdspecs for base, version in images ]
