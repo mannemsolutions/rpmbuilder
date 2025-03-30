@@ -220,6 +220,7 @@ jobs:
           DOCKER_BUILDKIT: 1
 
       - name: sign rpm's
+        if: ${{ env.GPG_KEY_B64 != '' }}
         run: |
           docker-compose up rpmsigner --exit-code-from rpmsigner
         env:
@@ -276,6 +277,7 @@ jobs:
           docker-compose up rpmdownloader --exit-code-from rpmdownloader
 
       - name: sign rpm's
+        if: ${{ env.GPG_KEY_B64 != '' }}
         run: |
           docker-compose up rpmsigner --exit-code-from rpmsigner
         env:
