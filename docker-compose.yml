@@ -29,4 +29,4 @@ services:
       - ./:/host
     environment:
       - GPG_PASSPHRASE
-      - GPG_KEY
+      - GPG_KEY_B64
