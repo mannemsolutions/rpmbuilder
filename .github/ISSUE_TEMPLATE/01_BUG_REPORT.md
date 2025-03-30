@@ -8,7 +8,7 @@ assignees: ''
 
 # Bug Report
 
-**PGcustodian version:**
+**RPM builder version:**
 
 <!-- Please specify commit or tag version. -->
 
