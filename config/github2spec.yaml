@@ -8,8 +8,15 @@ repositories:
       - src: 'chainsmith'
         dest: '%{_bindir}/{{ repository }}'
         mode: '0755'
+  pgtester:
+    organization: pgvillage-tools
+    asset_filter: '{{ repository }}_{{ version }}_linux_{{ binary_arch }}.tar.gz$'
+    files:
+      - src: '{{ repository }}'
+        dest: '%{_bindir}/{{ repository }}'
+        mode: '0755'
   pgfga:
-    organization: mannemsolutions
+    organization: pgvillage-tools
     asset_filter: '{{ repository }}_{{ version }}_linux_{{ binary_arch }}.tar.gz$'
     files:
       - src: '{{ repository }}'
