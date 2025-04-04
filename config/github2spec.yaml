@@ -1,11 +1,11 @@
 template: /host/rpmbuilder/templates/spec.j2
 dest: /host/specs/
 repositories:
-  ChainSmithGo:
-    organization: dbyond-nl
+  chainsmith:
+    organization: pgvillage-tools
     asset_filter: 'chainsmith_{{ version }}_linux_{{ binary_arch }}.tar.gz$'
     files:
-      - src: 'chainsmith'
+      - src: '{{ repository }}'
         dest: '%{_bindir}/{{ repository }}'
         mode: '0755'
   pgtester:
