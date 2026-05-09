@@ -33,9 +33,9 @@ function download_rpm {
 
 cd /host/rpms
 
-minio_rpms | while read -r RPM; do
-	download_rpm "$RPM"
-done
+#minio_rpms | while read -r RPM; do
+#	download_rpm "$RPM"
+#done
 
 github_release_rpms wal-g-builder | while read -r RPM; do
 	download_rpm "$RPM"
